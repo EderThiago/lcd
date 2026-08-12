@@ -1,0 +1,98 @@
+//https://www.alldatasheet.com/datasheet-pdf/view/63673/HITACHI/HD44780.html  VER ESTE LINK PAG 25
+//https://www.electronicaembajadores.com/datos/pdf1/lc/lcal/BC2004AIBN.pdf
+//file:///C:/Users/di3g4/Downloads/CFAH1602A-AGB-JP.PDF
+//https://cdn.soselectronic.com/productdata/8b/cc/a8e3a87e/bc-2004a-fnheh-1.pdf
+#include"lcd.h"
+#include"stm32f103xb.h"
+void lcd_init(LCD_t*  lcd ){
+    if(lcd->puerto==GPIOA){
+        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
+    }else if(lcd->puerto=GPIOB){
+        RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
+    }else if(lcd->puerto=GPIOC){
+        RCC->APB2ENR|=RCC_APB2ENR_IOPCEN;
+    }
+        for(int i=0;i<8;i++){
+            if(lcd->datos[i]<8){
+                lcd->puerto->CRL&=~(0xf<<(lcd->datos[i]*4));
+                lcd->puerto->CRL|=(0x1<<(lcd->datos[i]*4));
+            }else{
+                lcd->puerto->CRH&=~(0xf<<((lcd->datos[i]*4)%8));
+                lcd->puerto->CRH|=(0x1<<((lcd->datos[i]*4)%8));
+            }
+        }
+        if(lcd->rs<8){
+            lcd->puerto->CRL&=~(0xf<<(lcd->rs*4));
+            lcd->puerto->CRL|=(0x1<<(lcd->rs*4));
+        }else{
+            lcd->puerto->CRH&=~(0xf<<((lcd->rs*4)%8));
+            lcd->puerto->CRH|=(0x1<<((lcd->rs*4)%8));
+        }
+
+        if(lcd->rw<8){
+            lcd->puerto->CRL&=~(0xf<<(lcd->rw*4));
+            lcd->puerto->CRL|=(0x1<<(lcd->rw*4));
+        }else{
+            lcd->puerto->CRH&=~(0xf<<((lcd->rw*4)%8));
+            lcd->puerto->CRH|=(0x1<<((lcd->rw*4)%8));
+        }
+
+        if(lcd->vo<8){
+            lcd->puerto->CRL&=~(0xf<<(lcd->vo*4));
+            lcd->puerto->CRL|=(0x1<<(lcd->vo*4));
+        }else{
+            lcd->puerto->CRH&=~(0xf<<((lcd->vo*4)%8));
+            lcd->puerto->CRH|=(0x1<<((lcd->vo*4)%8));
+        }
+}
+void lcd_backlight(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=4;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[2]));
+}
+void lcd_noBacklight(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=4;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[2]+16));
+
+}
+void lcd_setCursor(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+}
+void lcd_scrollDisplayLeft(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=5;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[4]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[2]+16));
+}
+void lcd_scrollDisplayRight(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=5;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[4]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[2]));
+}
+void lcd_clear(LCD_t* lcd){
+    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=1;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[0]));
+    
+}
