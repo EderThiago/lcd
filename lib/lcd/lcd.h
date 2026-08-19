@@ -22,8 +22,7 @@ void lcd_scrollDisplayLeft(LCD_t* );
 void lcd_scrollDisplayRight(LCD_t* );
 void lcd_backlight();
 void lcd_noBacklight();
-void lcd_createChar (int num, int datos);
-void lcd_send (LCD_t*);
-void lcd_print(LCD_t* lcd, char *txt, int modoCaracter);
+void lcd_send (LCD_t *, uint8_t dato, int charcmd);
+void lcd_print(LCD_t* , char *txt);
 
 #endif

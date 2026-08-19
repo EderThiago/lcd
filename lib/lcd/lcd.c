@@ -5,9 +5,8 @@
 #include"lcd.h"
 #include"stm32f103xb.h"
 void lcd_init(LCD_t*  lcd ){
-    if(lcd->puerto==GPIOA){
-        RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
-    }else if(lcd->puerto=GPIOB){
+    
+        if(lcd->puerto=GPIOB){
         RCC->APB2ENR|=RCC_APB2ENR_IOPBEN;
     }else if(lcd->puerto=GPIOC){
         RCC->APB2ENR|=RCC_APB2ENR_IOPCEN;
@@ -95,20 +94,12 @@ void lcd_clear(LCD_t* lcd){
     
 }
 void lcd_setCursor(LCD_t* lcd, int col, int fil){
-    int shift=col+fil*16;
-    for(int i=0;i<fil;i++){
-        lcd->puerto->BSRR|=(1<<(lcd->rs+16));
-    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
-    for(int i=5;i<8;i++){
-        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
-    }
-    lcd->puerto->BSRR|=(1<<(lcd->datos[4]));
-    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
-    lcd->puerto->BSRR|=(1<<(lcd->datos[2]));
-    }
+    uint8_t row_shift[2]={0x00,0x40};
+    uint8_t comando=col+row_shift[fil];
+    lcd_send(lcd, comando, 0);
 
 }
-void lcd_send (LCD_t* lcd, uint8_t dato, int charcmd){
+void lcd_send (LCD_t *lcd, uint8_t dato, int charcmd){
     if(charcmd){
         lcd->puerto->BSRR|=(1<<(lcd->rw));
     }else{
