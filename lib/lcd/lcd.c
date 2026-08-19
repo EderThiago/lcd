@@ -64,9 +64,7 @@ void lcd_noBacklight(LCD_t* lcd){
     lcd->puerto->BSRR|=(1<<(lcd->datos[2]+16));
 
 }
-void lcd_setCursor(LCD_t* lcd){
-    lcd->puerto->BSRR|=(1<<(lcd->rs+16));
-}
+
 void lcd_scrollDisplayLeft(LCD_t* lcd){
     lcd->puerto->BSRR|=(1<<(lcd->rs+16));
     lcd->puerto->BSRR|=(1<<(lcd->rw+16));
@@ -95,4 +93,43 @@ void lcd_clear(LCD_t* lcd){
     }
     lcd->puerto->BSRR|=(1<<(lcd->datos[0]));
     
+}
+void lcd_setCursor(LCD_t* lcd, int col, int fil){
+    int shift=col+fil*16;
+    for(int i=0;i<fil;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->rs+16));
+    lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+    for(int i=5;i<8;i++){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+    lcd->puerto->BSRR|=(1<<(lcd->datos[4]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[3]));
+    lcd->puerto->BSRR|=(1<<(lcd->datos[2]));
+    }
+
+}
+void lcd_send (LCD_t* lcd, uint8_t dato, int charcmd){
+    if(charcmd){
+        lcd->puerto->BSRR|=(1<<(lcd->rw));
+    }else{
+        lcd->puerto->BSRR|=(1<<(lcd->rw+16));
+
+    }
+lcd->puerto->BSRR|=(1<<(lcd->rs));
+for(int i=7;i>=0;i--){
+   
+    if(dato&(1<<lcd->datos[i])){
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]));
+    }else{
+        lcd->puerto->BSRR|=(1<<(lcd->datos[i]+16));
+    }
+}
+
+}
+
+void lcd_print(LCD_t* lcd, char *txt){
+    while(*txt){
+        lcd_send(lcd, *txt, 0 );
+        txt++;
+    }
 }

@@ -9,19 +9,21 @@ typedef struct{
    int rw;
    int vo;
    int cursor;
-   int col;
-   int fil;
+   
+   
 
 }LCD_t;
 
 void lcd_init(LCD_t*);
 void lcd_clear(LCD_t*);
-void lcd_setCursor(LCD_t* );
+void lcd_setCursor(LCD_t*, int col, int fil );
 void lcd_print();
 void lcd_scrollDisplayLeft(LCD_t* );
 void lcd_scrollDisplayRight(LCD_t* );
 void lcd_backlight();
 void lcd_noBacklight();
 void lcd_createChar (int num, int datos);
+void lcd_send (LCD_t*);
+void lcd_print(LCD_t* lcd, char *txt, int modoCaracter);
 
 #endif
