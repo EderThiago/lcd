@@ -4,9 +4,8 @@
 #define left 2
 #define right 3
 #define cursor 4
-#define luz 5
-#define apagar 6
-#define clear 7
+#define apagar 5
+#define clear 6
 
 int main(void){
 
@@ -14,11 +13,12 @@ int main(void){
     LCD_t lcd;
     lcd.puerto=GPIOA;
     for(int i=0;i<8;i++){
-        lcd.datos[i]=8+i;
+        lcd.datos[i]=7+i;
     }
    
    lcd.rs=0;
    lcd.rw=1;
+   lcd.vo=15;
     RCC->APB2ENR|=RCC_APB2ENR_IOPAEN;
 
    for (int i=0;i<7;i++){
@@ -38,10 +38,11 @@ int main(void){
         lcd_scrollDisplayRight(&lcd);}
         if(GPIOA-> IDR&(1<<cursor)){
         lcd_setCursor(&lcd, 0, 1 );}
-        if(GPIOA-> IDR&(1<<luz)){
-        lcd_backlight();}
         if(GPIOA-> IDR&(1<<apagar)){
+        while(GPIOA-> IDR&(1<<apagar)){
         lcd_noBacklight();
+        }
+        lcd_backlight();
         }
         if(GPIOA-> IDR&(1<<clear)){
         lcd_clear(&lcd);
